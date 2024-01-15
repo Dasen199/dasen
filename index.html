@@ -1,230 +1,135 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>h5小游戏盒子网站</title>
     <style>
-        /* CSS样式 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* 你可以在这里添加CSS样式 */
+        h1 {
+            text-align: center;
+            color: white; /* 设置标题的颜色为白色 */
+            background-color: #333; /* 设置标题的背景色为深灰色 */
+            padding: 10px; /* 设置标题的内边距为10px */
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            height: 80px;
-            background-color: #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            font-size: 32px;
-            font-weight: bold;
-            color: #333;
-            margin-left: 20px;
-        }
-
-        .nav {
+        ul {
             list-style: none;
             display: flex;
-            margin-right: 20px;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            width: 90%; /* 设置列表的宽度为90% */
+            margin: 0 auto; /* 设置列表的水平居中 */
         }
 
-        .nav li {
-            margin-left: 20px;
-        }
-
-        .nav a {
-            text-decoration: none;
-            color: #333;
-        }
-
-        .nav a:hover {
-            color: #f00;
-        }
-
-        .select {
-            margin-right: 20px;
-        }
-
-        .main {
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            grid-gap: 20px;
-        }
-
-        .game {
-            border: 1px solid #ccc;
-            border-radius: 10px;
+        li {
+            width: 15%; /* 设置列表项的宽度为15% */
+            height: 300px; /* 设置列表项的高度为300px */
+            margin: 10px;
+            border: 1px solid black;
             overflow: hidden;
+            position: relative; /* 设置列表项的定位为相对定位 */
+            box-shadow: 5px 5px 10px #999; /* 设置列表项的阴影效果 */
+            transition: transform 0.3s; /* 设置列表项的过渡效果 */
         }
 
-        .game img {
+        li:hover {
+            transform: scale(1.1); /* 设置列表项的放大效果 */
+        }
+
+        img {
             width: 100%;
-            height: 150px;
-            object-fit: cover;
+            height: 60%; /* 设置图片的高度为60% */
         }
 
-        .game h3 {
-            font-size: 18px;
+        p {
             padding: 10px;
-            text-align: center;
+            font-size: 14px;
+            height: 40%; /* 设置描述的高度为40% */
+            overflow: hidden; /* 设置描述的溢出隐藏 */
+            text-overflow: ellipsis; /* 设置描述的文本溢出显示省略号 */
+          text-align: center; /* 设置游戏名字的居中效果 */
         }
 
-        .game button {
+span {
+    font-weight: bold; /* 设置游戏名字的加粗效果 */
+    display: block; /* 设置游戏名字的独占一行效果 */
+    text-align: center; /* 设置游戏名字的居中效果 */
+    margin-top: 10px; /* 设置名字的顶部边距为60px */
+}
+
+        iframe {
             width: 100%;
-            height: 40px;
-            background-color: #f00;
-            color: #fff;
+            height: 100%;
             border: none;
-            cursor: pointer;
-        }
-
-        .game button:hover {
-            background-color: #c00;
-        }
-
-        .footer {
-            height: 60px;
-            background-color: #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .footer p {
-            color: #333;
-        }
-
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                height: auto;
-            }
-
-            .logo {
-                margin: 10px;
-            }
-
-            .nav {
-                margin: 10px;
-                flex-wrap: wrap;
-            }
-
-            .nav li {
-                margin: 5px;
-            }
+            position: absolute; /* 设置iframe的定位为绝对定位 */
+            top: 0; /* 设置iframe的顶部为0 */
+            left: 0; /* 设置iframe的左边为0 */
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- 头部 -->
-        <div class="header">
-            <div class="logo">h5小游戏盒子网站</div>
-            <ul class="nav">
-                <li><a href="#">首页</a></li>
-                <li><a href="#">分类</a></li>
-                <li><a href="#">排行</a></li>
-                <li><a href="#">我的</a></li>
-            </ul>
-            <!-- 添加一个下拉菜单，让用户可以选择不同的游戏类别 -->
-            <select class="select" id="select">
-                <option value="all">全部</option>
-                <option value="action">动作</option>
-                <option value="puzzle">益智</option>
-                <option value="sports">体育</option>
-                <option value="adventure">冒险</option>
-            </select>
-        </div>
-        <!-- 主体 -->
-        <div class="main" id="main">
-            <!-- 游戏列表 -->
-        </div>
-        <!-- 尾部 -->
-        <div class="footer">
-            <p>© 2024 h5小游戏盒子网站. All rights reserved.</p>
-        </div>
-    </div>
+    <h1>酷玩空间秒玩小游戏</h1>
+    <ul id="games"></ul>
     <script>
-        // JavaScript代码
-        // 获取游戏列表容器
-        var main = document.getElementById("main");
-        // 获取游戏类别下拉菜单
-        var select = document.getElementById("select");
-        // 获取游戏资源数据
+        // 你可以在这里添加JavaScript代码
+        // 获取游戏数据的链接
+        var url = "https://gamemonetize.com/rssfeed.php?format=json&category=All&type=mobile&popularity=mostplayed&company=All&amount=30";
+        // 发送请求并接收响应
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "https://raw.staticdn.net/Dasen199/dasen199.github.io/main/game.json");
-        xhr.send();
-        xhr.onload = function () {
-            // 解析JSON数据
-            var data = JSON.parse(xhr.responseText);
-            // 定义一个函数，根据游戏类别，生成游戏列表
-            function createGameList(category) {
-                // 清空游戏列表容器
-                main.innerHTML = "";
-                // 遍历数据，生成游戏列表
+        xhr.open("GET", url, true);
+        xhr.onload = function() {
+            if (xhr.status == 200) {
+                // 解析JSON数据
+                var data = JSON.parse(xhr.responseText);
+                // 获取游戏列表的容器元素
+                var games = document.getElementById("games");
+                // 遍历每个游戏数据
                 for (var i = 0; i < data.length; i++) {
-                    // 判断游戏类别是否符合用户选择的类别，或者用户选择的是全部类别
-                    if (data[i].category == category || category == "all") {
-                        // 创建游戏元素
-                        var game = document.createElement("div");
-                        game.className = "game";
-                        // 创建游戏图片
-                        var img = document.createElement("img");
-                        img.src = data[i].img;
-                        // 创建游戏标题
-                        var h3 = document.createElement("h3");
-                        h3.textContent = data[i].name;
-                        // 创建游戏按钮
-                        var button = document.createElement("button");
-                        button.textContent = "开始游戏";
-                        // 给按钮添加点击事件，打开游戏链接
-                        button.onclick = function (e) {
-                            // 获取当前按钮的父元素
-                            var parent = e.target.parentNode;
-                            // 获取父元素的第二个子元素，即标题
-                            var title = parent.children[1];
-                            // 获取标题的文本内容，即游戏名称
-                            var name = title.textContent;
-                            // 根据游戏名称，在数据中查找对应的游戏链接
-                            for (var j = 0; j < data.length; j++) {
-                                if (data[j].name == name) {
-                                    // 找到游戏链接，打开新窗口
-                                    window.open(data[j].url);
-                                    break;
-                                }
-                            }
-                        };
-                        // 将图片，标题，按钮添加到游戏元素中
-                        game.appendChild(img);
-                        game.appendChild(h3);
-                        game.appendChild(button);
-                        // 将游戏元素添加到游戏列表容器中
-                        main.appendChild(game);
-                    }
+                    // 创建游戏列表项的元素
+                    var li = document.createElement("li");
+                    // 创建游戏图片的元素
+                    var img = document.createElement("img");
+                    // 设置图片的属性
+                    img.src = data[i].thumb;
+                    img.alt = data[i].title;
+                    // 创建游戏描述的元素
+                    var p = document.createElement("p");
+                    // 创建游戏名字的元素
+                    var span = document.createElement("span");
+                    // 设置游戏名字的内容
+                    span.textContent = data[i].title;
+                    // 设置游戏描述的内容
+                    p.textContent = data[i].description.substring(0, 50) + "..."; // 设置描述的内容为前50个字符加上省略号
+                    p.title = data[i].description; // 设置描述的title属性为完整的内容，当鼠标悬停时显示
+                    // 将图片、游戏名字和描述添加到列表项中
+                    li.appendChild(img);
+                    li.appendChild(span);
+                    li.appendChild(p);
+                    // 将列表项添加到列表中
+                    games.appendChild(li);
+                    // 为列表项添加点击事件
+                    li.addEventListener("click", function() {
+                        // 获取当前点击的列表项
+                        var current = this;
+                        // 获取当前点击的游戏的链接
+                        var link = data[current.index].link;
+                        // 创建iframe元素
+                        var iframe = document.createElement("iframe");
+                        // 设置iframe的属性
+                        iframe.src = link;
+                        // 将iframe添加到列表项中
+                        current.appendChild(iframe);
+                        // 为iframe添加加载完成事件
+                        iframe.onload = function() {
+                            // 移除列表项中的其他元素
+                            current.removeChild(current.firstChild);
+                            current.removeChild(current.firstChild);
+                            current.removeChild(current.firstChild);
+                        }
+                    });
+                    // 为列表项添加索引属性，方便获取对应的游戏数据
+                    li.index = i;
                 }
             }
-            // 调用函数，生成默认的游戏列表（全部类别）
-            createGameList("all");
-            // 给下拉菜单添加改变事件，根据用户选择的游戏类别，重新生成游戏列表
-            select.onchange = function () {
-                // 获取用户选择的游戏类别
-                var category = select.value;
-                // 调用函数，生成对应的游戏列表
-                createGameList(category);
-            };
         };
+        xhr.send();
     </script>
 </body>
 </html>
