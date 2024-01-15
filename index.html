@@ -1,0 +1,321 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>小鸟游戏</title>
+  <style>
+    #game {
+      width: 343px;
+      height: 480px;
+      border: 2px solid;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+    #game .sky {
+      width: 1600px;
+      height: 600px;
+      background: lightblue;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+    #game .land {
+      width: 1600px;
+      height: 112px;
+      background: green;
+      position: absolute;
+      left: 0;
+      bottom: 0;
+    }
+#game .bird {
+      width: 40px;
+      height: 30px;
+      background: yellow;
+      border-radius: 50%;
+      position: absolute;
+      left: 30px;
+      top: 100px;
+    }
+    #game .pipeup {
+      background: brown;
+      width: 52px;
+      height: 200px;
+      position: absolute;
+      top: 0;
+    }
+    #game .pipedown {
+      background: brown;
+      width: 52px;
+      height: 200px;
+      position: absolute;
+      bottom: 112px; 
+    }
+    #game .score {
+      width: 28px;
+      height: 39px;
+      background: white;
+      color: black;
+      font-size: 28px;
+      text-align: center;
+      position: absolute;
+      left: 50%;
+      top: 70px;
+    }
+    #game .start {
+      width: 85px;
+      height: 29px;
+      background: orange;
+      color: white;
+      font-size: 18px;
+      text-align: center;
+      line-height: 29px;
+      position: absolute;
+      left: 50%;
+      bottom: 150px; 
+    }
+    #game .over {
+     width :286 px ;
+     height :116 px ;
+     background :red ;
+     color :white ;
+     font-size :36 px ;
+     text-align :center ;
+     line-height :116 px ;
+     position :absolute ;
+     left :50 % ;
+     top :150 px ; 
+   }
+ </style>
+</head>
+<body>
+<div id="game">
+<div class="sky"></div>
+<div class="land"></div>
+<div class="bird"></div>
+<div class="score">0</div>
+<div class="start">开始</div>
+</div>
+<script>
+  
+  
+// 获取游戏元素
+var game = document.getElementById("game");
+var sky = game.querySelector(".sky");
+var land = game.querySelector(".land");
+var bird = game.querySelector(".bird");
+var score = game.querySelector(".score");
+var start = game.querySelector(".start");
+var over = null;
+
+// 定义一些常量
+var SKY_WIDTH = 800; // 天空的宽度
+var SKY_SPEED = 2; // 天空的移动速度
+var LAND_HEIGHT = 112; // 大地的高度
+var LAND_SPEED = 2; // 大地的移动速度
+var BIRD_WIDTH = 70; // 小鸟的宽度
+var BIRD_HEIGHT = 70; // 小鸟的高度
+var BIRD_TOP = 150; // 小鸟的初始纵坐标
+var BIRD_LEFT = 30; // 小鸟的横坐标
+var GRAVITY = 0.3; // 重力加速度
+var JUMP_SPEED = -6; // 跳跃初速度
+var PIPE_WIDTH = 52; // 柱子的宽度
+var PIPE_SPEED = 2; // 柱子的移动速度
+var PIPE_SPACE = 200; // 上下柱子的间距
+var PIPE_INTERVAL = 3500; // 每隔多少毫秒生成一个柱子
+
+// 定义一些变量
+var skyTimer = null; // 天空移动的计时器
+var skyOffset = 0; // 天空偏移量
+var landTimer = null; // 大地移动的计时器
+var landOffset = 0; // 大地偏移量
+var birdTimer = null; // 小鸟煽动翅膀的计时器
+var birdIndex = 0; // 小鸟图片索引
+var birdSpeed = 0; // 小鸟下落速度
+var birdTop = BIRD_TOP; // 小鸟纵坐标
+var pipeTimer = null; // 柱子生成和移动的计时器
+var pipeArr = []; // 存放柱子对象的数组
+
+// 定义一个函数，用于创建柱子对象，并返回该对象
+function createPipe() {
+  var upHeight = Math.floor(Math.random() * (300 - PIPE_SPACE)) + PIPE_SPACE;
+  var downHeight = 600 - LAND_HEIGHT - upHeight - PIPE_SPACE;
+  var upDom = document.createElement("div");
+  upDom.className = "pipeup";
+  upDom.style.height = upHeight + "px";
+  var downDom = document.createElement("div");
+  downDom.className = "pipedown";
+  downDom.style.height = downHeight + "px";
+  game.appendChild(upDom);
+  game.appendChild(downDom);
+  
+  return {
+    up: upDom,
+    down: downDom,
+    left: SKY_WIDTH,
+    top: upHeight,
+    bottom: upHeight + PIPE_SPACE,
+    remove: function() {
+      game.removeChild(this.up);
+      game.removeChild(this.down);
+    }
+  };
+}
+
+// 定义一个函数，用于判断小鸟是否碰撞到柱子或者大地，如果是，返回 true，否则返回 false
+function isHit() {
+  for (let i=0;i<pipeArr.length;i++) {
+    var pipeLeftMin=pipeArr[i].left;
+    var pipeLeftMax=pipeArr[i].left+PIPE_WIDTH;
+    var birdLeftMin=BIRD_LEFT;
+    var birdLeftMax=BIRD_LEFT+BIRD_WIDTH;
+    if (birdLeftMax > pipeLeftMin && birdLeftMin < pipeLeftMax) {
+      var pipeTop=pipeArr[i].top;
+      var pipeBottom=pipeArr[i].bottom;
+      var birdTopMin=birdTop;
+      var birdTopMax=birdTop+BIRD_HEIGHT;
+      if (birdTopMin < pipeTop || birdTopMax > pipeBottom) {
+        return true;
+      }
+    }
+    
+  }
+  
+  if (birdTop + BIRD_HEIGHT >= SKY_WIDTH - LAND_HEIGHT) {
+    return true;
+  }
+
+  return false;
+}
+
+// 定义一个函数，用于显示游戏结束的界面
+function showGameOver() {
+  over = document.createElement("div");
+  over.className = "over";
+  game.appendChild(over);
+}
+
+// 定义一个函数，用于开始游戏
+function startGame() {
+  // 天空移动
+  skyTimer = setInterval(function() {
+    skyOffset -= SKY_SPEED;
+    if (skyOffset <= -SKY_WIDTH) {
+      skyOffset = 0;
+    }
+    sky.style.left = skyOffset + "px";
+  }, 30);
+
+  // 大地移动
+  landTimer = setInterval(function() {
+    landOffset -= LAND_SPEED;
+    if (landOffset <= -SKY_WIDTH) {
+      landOffset = 0;
+    }
+    land.style.left = landOffset + "px";
+  }, 30);
+
+  // 小鸟煽动翅膀
+  birdTimer = setInterval(function() {
+    birdIndex++;
+    if (birdIndex === 3) {
+      birdIndex = 0;
+    }
+    bird.style.backgroundImage = `url(img/bird${birdIndex}.png)`;
+  }, 200);
+
+  // 小鸟下落
+  birdDropTimer = setInterval(function() {
+    birdSpeed += GRAVITY;
+    birdTop += birdSpeed;
+    if (birdTop < 0) {
+      birdTop = 0;
+      birdSpeed = JUMP_SPEED;
+    }
+    bird.style.top = birdTop + "px";
+    
+    // 判断是否碰撞
+    if (isHit()) {
+      clearInterval(birdDropTimer);
+      clearInterval(pipeTimer);
+      showGameOver();
+    }
+    
+  }, 30);
+
+  // 柱子生成和移动
+  pipeTimer = setInterval(function() {
+    // 创建柱子对象，并添加到数组中
+    var pipe = createPipe();
+    pipeArr.push(pipe);
+
+    // 移动柱子
+    pipeMoveTimer = setInterval(function() {
+      pipe.left -= PIPE_SPEED;
+      if (pipe.left <= -PIPE_WIDTH) {
+        pipe.remove();
+        pipeArr.shift();
+        clearInterval(pipeMoveTimer);
+      }
+      pipe.up.style.left = pipe.left + "px";
+      pipe.down.style.left = pipe.left + "px";
+      
+      // 判断是否碰撞
+      if (isHit()) {
+        clearInterval(birdDropTimer);
+        clearInterval(pipeTimer);
+        showGameOver();
+      }
+      
+    }, 30);
+    
+  }, PIPE_INTERVAL);
+  
+}
+
+// 定义一个函数，用于暂停游戏
+function pauseGame() {
+  clearInterval(skyTimer);
+  clearInterval(landTimer);
+  clearInterval(birdTimer);
+  clearInterval(birdDropTimer);
+  clearInterval(pipeTimer);
+}
+
+// 定义一个函数，用于跳跃
+function jump() {
+  birdSpeed = JUMP_SPEED;
+}
+
+// 给开始按钮添加点击事件，开始游戏
+start.onclick = function() {
+  start.style.display = "none";
+  startGame();
+};
+
+// 给文档添加键盘按下事件，实现跳跃和暂停功能
+document.onkeydown = function(e) {
+  if (e.key === " ") { // 空格键跳跃
+    jump();
+  } else if (e.key === "Enter") { // 回车键暂停或继续
+    if (game.paused) { // 如果当前是暂停状态，就继续游戏
+      game.paused = false;
+      startGame();
+    } else { // 如果当前是游戏状态，就暂停游戏
+      game.paused = true;
+      pauseGame();
+    }
+    
+  }
+};
+
+// 给文档添加触摸事件，实现跳跃功能
+document.ontouchstart = function(e) {
+  e.preventDefault(); // 阻止默认行为，如滚动屏幕
+  jump(); // 调用跳跃函数
+};
+
+</script>
+</body>
+</html>
