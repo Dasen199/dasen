@@ -68,68 +68,143 @@ span {
     <h1>酷玩空间秒玩小游戏</h1>
     <ul id="games"></ul>
     <script>
-        // 你可以在这里添加JavaScript代码
-        // 获取游戏数据的链接
-        var url = "https://gamemonetize.com/rssfeed.php?format=json&category=All&type=mobile&popularity=mostplayed&company=All&amount=30";
-        // 发送请求并接收响应
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", url, true);
-        xhr.onload = function() {
-            if (xhr.status == 200) {
-                // 解析JSON数据
-                var data = JSON.parse(xhr.responseText);
-                // 获取游戏列表的容器元素
-                var games = document.getElementById("games");
-                // 遍历每个游戏数据
-                for (var i = 0; i < data.length; i++) {
-                    // 创建游戏列表项的元素
-                    var li = document.createElement("li");
-                    // 创建游戏图片的元素
-                    var img = document.createElement("img");
-                    // 设置图片的属性
-                    img.src = data[i].thumb;
-                    img.alt = data[i].title;
-                    // 创建游戏描述的元素
-                    var p = document.createElement("p");
-                    // 创建游戏名字的元素
-                    var span = document.createElement("span");
-                    // 设置游戏名字的内容
-                    span.textContent = data[i].title;
-                    // 设置游戏描述的内容
-                    p.textContent = data[i].description.substring(0, 50) + "..."; // 设置描述的内容为前50个字符加上省略号
-                    p.title = data[i].description; // 设置描述的title属性为完整的内容，当鼠标悬停时显示
-                    // 将图片、游戏名字和描述添加到列表项中
-                    li.appendChild(img);
-                    li.appendChild(span);
-                    li.appendChild(p);
-                    // 将列表项添加到列表中
-                    games.appendChild(li);
-                    // 为列表项添加点击事件
-                    li.addEventListener("click", function() {
-                        // 获取当前点击的列表项
-                        var current = this;
-                        // 获取当前点击的游戏的链接
-                        var link = data[current.index].link;
-                        // 创建iframe元素
-                        var iframe = document.createElement("iframe");
-                        // 设置iframe的属性
-                        iframe.src = link;
-                        // 将iframe添加到列表项中
-                        current.appendChild(iframe);
-                        // 为iframe添加加载完成事件
-                        iframe.onload = function() {
-                            // 移除列表项中的其他元素
-                            current.removeChild(current.firstChild);
-                            current.removeChild(current.firstChild);
-                            current.removeChild(current.firstChild);
-                        }
-                    });
-                    // 为列表项添加索引属性，方便获取对应的游戏数据
-                    li.index = i;
+   // 你可以在这里添加JavaScript代码
+// 获取游戏数据的链接
+var url = "https://gamemonetize.com/rssfeed.php?format=json&category=All&type=mobile&popularity=mostplayed&company=All&amount=100";
+// 发送请求并接收响应
+var xhr = new XMLHttpRequest();
+xhr.open("GET", url, true);
+xhr.onload = function() {
+    if (xhr.status == 200) {
+        // 解析JSON数据
+        var data = JSON.parse(xhr.responseText);
+        // 获取游戏列表的容器元素
+        var games = document.getElementById("games");
+        // 遍历每个游戏数据
+        for (var i = 0; i < data.length; i++) {
+            // 创建游戏列表项的元素
+            var li = document.createElement("li");
+            // 创建游戏图片的元素
+            var img = document.createElement("img");
+            // 设置图片的属性
+            img.src = data[i].thumb;
+            img.alt = data[i].title;
+            // 创建游戏描述的元素
+            var p = document.createElement("p");
+            // 创建游戏名字的元素
+            var span = document.createElement("span");
+            // 设置游戏名字的内容
+            span.textContent = data[i].title;
+            // 设置游戏描述的内容
+            p.textContent = data[i].description.substring(0, 50) + "..."; // 设置描述的内容为前50个字符加上省略号
+            p.title = data[i].description; // 设置描述的title属性为完整的内容，当鼠标悬停时显示
+            // 将图片、游戏名字和描述添加到列表项中
+            li.appendChild(img);
+            li.appendChild(span);
+            li.appendChild(p);
+            // 将列表项添加到列表中
+            games.appendChild(li);
+            // 为列表项添加点击事件
+            li.addEventListener("click", function() {
+                // 获取当前点击的列表项
+                var current = this;
+                // 获取当前点击的游戏的链接
+                var link = data[current.index].url;
+                // 创建iframe元素
+                var iframe = document.createElement("iframe");
+                // 设置iframe的属性
+                iframe.src = link;
+                // 将iframe添加到列表项中
+                current.appendChild(iframe);
+                // 为iframe添加加载完成事件
+                iframe.onload = function() {
+                    // 移除列表项中的其他元素
+                    current.removeChild(current.firstChild);
+                    current.removeChild(current.firstChild);
+                    current.removeChild(current.firstChild);
+                    // 退出全屏模式
+                    exitFullScreen();
                 }
-            }
-        };
-        xhr.send();
+                // 进入全屏模式
+                fullScreen(current);
+            });
+            // 为列表项添加索引属性，方便获取对应的游戏数据
+            li.index = i;
+        }
+    }
+};
+xhr.send();
+
+// 定义进入全屏模式的函数
+function fullScreen(element) {
+    if (element.requestFullscreen) {
+        element.requestFullscreen();
+    } else if (element.mozRequestFullScreen) {
+        // Firefox
+        element.mozRequestFullScreen();
+    } else if (element.webkitRequestFullscreen) {
+        // Chrome, Safari and Opera
+        element.webkitRequestFullscreen();
+    } else if (element.msRequestFullscreen) {
+        // Internet Explorer and Edge
+        element.msRequestFullscreen();
+    }
+}
+
+// 定义退出全屏模式的函数
+function exitFullScreen() {
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+    }
+}
+
+// 添加全屏模式变化的事件监听器
+document.addEventListener('fullscreenchange', handleFullscreenChange);
+document.addEventListener('mozfullscreenchange', handleFullscreenChange); // Firefox
+document.addEventListener('webkitfullscreenchange', handleFullscreenChange); // Chrome, Safari and Opera
+document.addEventListener('MSFullscreenChange', handleFullscreenChange); // Internet Explorer and Edge
+
+// 定义全屏模式变化的处理函数
+function handleFullscreenChange() {
+    // 获取当前全屏元素
+    var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+    if (fullscreenElement) {
+        // 进入全屏模式
+        console.log('进入全屏模式');
+    } else {
+        // 退出全屏模式
+        console.log('退出全屏模式');
+        // 恢复列表项中的其他元素
+        var games = document.getElementById("games");
+        var li = games.children[0];
+        var data = JSON.parse(xhr.responseText);
+        // 创建游戏图片的元素
+        var img = document.createElement("img");
+        // 设置图片的属性
+        img.src = data[li.index].thumb;
+        img.alt = data[li.index].title;
+        // 创建游戏描述的元素
+        var p = document.createElement("p");
+        // 创建游戏名字的元素
+        var span = document.createElement("span");
+        // 设置游戏名字的内容
+        span.textContent = data[li.index].title;
+        // 设置游戏描述的内容
+        p.textContent = data[li.index].description.substring(0, 50) + "..."; // 设置描述的内容为前50个字符加上省略号
+        p.title = data[li.index].description; // 设置描述的title属性为完整的内容，当鼠标悬停时显示
+        // 将图片、游戏名字和描述添加到列表项中
+        li.appendChild(img);
+        li.appendChild(span);
+        li.appendChild(p);
+    }
+}
+
     </script>
 </body>
 </html>
