@@ -1,8 +1,8 @@
 <html>
 <head>
     <meta charset="utf-8">
-  
-    <title>酷玩空间1</title>
+
+    <title>酷玩空间</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         * {
@@ -218,7 +218,6 @@
             const gameElement = document.createElement("div");
             gameElement.className = "game";
 
-    
             // 创建一个img元素，用于显示游戏图片
             const gameImage = document.createElement("img");
             gameImage.src = game.thumb;
@@ -234,11 +233,11 @@
 
             // 给div元素添加一个点击事件，用于打开模态框并显示游戏
             gameElement.addEventListener("click", function() {
-                // 创建一个iframe元素，用于加载游戏
-                const gameFrame = document.createElement("iframe");
-                gameFrame.src = game.url;
-                gameFrame.width = game.width;
-                gameFrame.height = game.height;
+           // 创建一个iframe元素，用于加载游戏
+const gameFrame = document.createElement("iframe");
+gameFrame.src = game.url;
+gameFrame.width = "50%";
+gameFrame.height = "50%";
 
                 // 把iframe元素添加到模态框内容区域中
                 modalContent.appendChild(gameFrame);
@@ -269,6 +268,8 @@
                     data.forEach(function(game) {
                         // 调用createGameElement函数，创建一个游戏元素
                         const gameElement = createGameElement(game);
+
+                        // 把游戏元素添加到显示游戏的区域中
 
                         // 把游戏元素添加到显示游戏的区域中
                         games.appendChild(gameElement);
@@ -307,3 +308,5 @@
     </script>
 </body>
 </html>
+
+
