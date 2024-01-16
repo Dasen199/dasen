@@ -122,7 +122,6 @@
             right: -50px;
             background: linear-gradient(to right, blue, pink);
             transform: scale(1.2);
-            clip-path: inset(0 50% 0 0);
         }
 
         .modal {
@@ -218,6 +217,7 @@
             const gameElement = document.createElement("div");
             gameElement.className = "game";
 
+    
             // 创建一个img元素，用于显示游戏图片
             const gameImage = document.createElement("img");
             gameImage.src = game.thumb;
@@ -227,7 +227,6 @@
             const gameTitle = document.createElement("h3");
             gameTitle.textContent = game.title;
 
-     
             // 把img和h3元素添加到div元素中
             gameElement.appendChild(gameImage);
             gameElement.appendChild(gameTitle);
@@ -307,5 +306,3 @@
     </script>
 </body>
 </html>
-
-
