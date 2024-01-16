@@ -85,6 +85,7 @@
             padding: 5px;
             text-align: center;
             border-radius: 0 0 15px 15px;
+            font-size: 12px;
         }
 
         .footer {
@@ -111,15 +112,17 @@
         }
 
         .circle-left {
-    bottom: -100px;
-    left: -100px;
-    background: linear-gradient(to right, yellow, orange);
-}
+            bottom: -100px;
+            left: -100px;
+            background: linear-gradient(to right, yellow, orange);
+        }
+
         .circle-right {
             bottom: -100px;
-            right: -100px;
+            right: -50px;
             background: linear-gradient(to right, blue, pink);
             transform: scale(1.2);
+            clip-path: inset(0 50% 0 0);
         }
 
         .modal {
@@ -220,10 +223,11 @@
             gameImage.src = game.thumb;
             gameImage.alt = game.title;
 
-            // 创建一个h3元素，用于显示游戏标题和类别
+            // 创建一个h3元素，用于显示游戏标题
             const gameTitle = document.createElement("h3");
-            gameTitle.textContent = game.title + " (" + game.category + ")";
+            gameTitle.textContent = game.title;
 
+     
             // 把img和h3元素添加到div元素中
             gameElement.appendChild(gameImage);
             gameElement.appendChild(gameTitle);
@@ -303,3 +307,5 @@
     </script>
 </body>
 </html>
+
+
