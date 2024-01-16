@@ -14,7 +14,8 @@
             background-color: #000;
             color: #fff;
             font-family: Arial, sans-serif;
-            background-image: radial-gradient(rgba(255, 0, 0, 0.1), rgba(0, 0, 255, 0.1));
+            background-image: linear-gradient(to right, rgba(255, 0, 0, 0.3), rgba(0, 0, 255, 0.3));
+            overflow-x: hidden;
         }
 
         .container {
@@ -52,14 +53,14 @@
 
         .main {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            grid-gap: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 10px;
             margin-top: 20px;
         }
 
         .game {
             width: 100%;
-            height: 100px;
+            height: 100%;
             border: 2px solid gold;
             position: relative;
             border-radius: 20px;
@@ -71,6 +72,7 @@
             height: 100%;
             object-fit: cover;
             border-radius: 15px;
+            background-color: #222;
         }
 
         .game h3 {
@@ -109,16 +111,61 @@
         }
 
         .circle-left {
-            bottom: -100px;
-            left: -100px;
-            background: linear-gradient(to right, yellow, orange);
-        }
-
+    bottom: -100px;
+    left: -100px;
+    background: linear-gradient(to right, yellow, orange);
+}
         .circle-right {
             bottom: -100px;
             right: -100px;
             background: linear-gradient(to right, blue, pink);
             transform: scale(1.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 999;
+        }
+
+        .modal-content {
+            width: 800px;
+            height: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border: none;
+            background-color: transparent;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-fullscreen {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 30px;
+            height: 30px;
+            border: none;
+            background-color: transparent;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -131,61 +178,128 @@
             <a href="#">排行</a>
             <a href="#">我的</a>
         </div>
-        <div class="main">
-            <div class="game">
-                <img src="game1.jpg" alt="游戏1">
-                <h3>游戏1</h3>
-            </div>
-            <div class="game">
-                <img src="game2.jpg" alt="游戏2">
-                <h3>游戏2</h3>
-            </div>
-            <div class="game">
-                <img src="game3.jpg" alt="游戏3">
-                <h3>游戏3</h3>
-            </div>
-            <div class="game">
-                <img src="game4.jpg" alt="游戏4">
-                <h3>游戏4</h3>
-            </div>
-            <div class="game">
-                <img src="game5.jpg" alt="游戏5">
-                <h3>游戏5</h3>
-            </div>
- <div class="game">
-                <img src="game5.jpg" alt="游戏5">
-                <h3>游戏5</h3>
-            </div>
- <div class="game">
-                <img src="game5.jpg" alt="游戏5">
-                <h3>游戏5</h3>
-            </div>
- <div class="game">
-                <img src="game5.jpg" alt="游戏5">
-                <h3>游戏5</h3>
-            </div>
- <div class="game">
-                <img src="game5.jpg" alt="游戏5">
-                <h3>游戏5</h3>
-            </div>
- <div class="game">
-                <img src="game5.jpg" alt="游戏5">
-                <h3>游戏5</h3>
-            </div>
- <div class="game">
-                <img src="game5.jpg" alt="游戏5">
-                <h3>游戏5</h3>
-            </div>
- <div class="game">
-                <img src="game5.jpg" alt="游戏5">
-                <h3>游戏5</h3>
-            </div>
-        </div>
+        <div class="main" id="games"></div>
         <div class="footer">
             <p>© 2024 酷玩空间. All rights reserved.</p>
             <div class="circle circle-left"></div>
             <div class="circle circle-right"></div>
         </div>
     </div>
+    <div class="modal" id="modal">
+        <div class="modal-content" id="modal-content"></div>
+        <button class="modal-close" id="modal-close">×</button>
+        <button class="modal-fullscreen" id="modal-fullscreen">⛶</button>
+    </div>
+    <script>
+        // 获取游戏数据的链接
+        const feedUrl = "https://gamemonetize.com/rssfeed.php?format=json&category=All&type=html5&popularity=mostplayed&company=All&amount=100";
+
+        // 获取显示游戏的区域
+        const games = document.getElementById("games");
+
+        // 获取显示模态框的区域
+        const modal = document.getElementById("modal");
+
+        // 获取显示模态框内容的区域
+        const modalContent = document.getElementById("modal-content");
+
+        // 获取关闭模态框的按钮
+        const modalClose = document.getElementById("modal-close");
+
+        // 获取全屏模态框的按钮
+        const modalFullscreen = document.getElementById("modal-fullscreen");
+
+        // 定义一个函数，用于创建和显示游戏元素
+        function createGameElement(game) {
+            // 创建一个div元素，用于包裹游戏信息
+            const gameElement = document.createElement("div");
+            gameElement.className = "game";
+
+            // 创建一个img元素，用于显示游戏图片
+            const gameImage = document.createElement("img");
+            gameImage.src = game.thumb;
+            gameImage.alt = game.title;
+
+            // 创建一个h3元素，用于显示游戏标题和类别
+            const gameTitle = document.createElement("h3");
+            gameTitle.textContent = game.title + " (" + game.category + ")";
+
+            // 把img和h3元素添加到div元素中
+            gameElement.appendChild(gameImage);
+            gameElement.appendChild(gameTitle);
+
+            // 给div元素添加一个点击事件，用于打开模态框并显示游戏
+            gameElement.addEventListener("click", function() {
+                // 创建一个iframe元素，用于加载游戏
+                const gameFrame = document.createElement("iframe");
+                gameFrame.src = game.url;
+                gameFrame.width = game.width;
+                gameFrame.height = game.height;
+
+                // 把iframe元素添加到模态框内容区域中
+                modalContent.appendChild(gameFrame);
+
+                // 显示模态框
+                modal.style.display = "block";
+            });
+
+            // 返回div元素
+            return gameElement;
+        }
+
+        // 定义一个函数，用于请求和解析游戏数据
+        function fetchGames() {
+            // 使用fetch API来请求游戏数据
+            fetch(feedUrl)
+                .then(function(response) {
+                    // 如果请求成功，返回响应的JSON数据
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        // 如果请求失败，抛出一个错误
+                        throw new Error("请求失败，状态码：" + response.status);
+                    }
+                })
+                .then(function(data) {
+                    // 如果解析成功，遍历数据中的每个游戏
+                    data.forEach(function(game) {
+                        // 调用createGameElement函数，创建一个游戏元素
+                        const gameElement = createGameElement(game);
+
+                        // 把游戏元素添加到显示游戏的区域中
+                        games.appendChild(gameElement);
+                    });
+                })
+                .catch(function(error) {
+                    // 如果发生错误，打印错误信息
+                    console.error(error);
+                });
+        }
+
+        // 调用fetchGames函数，获取和显示游戏数据
+        fetchGames();
+
+        // 给关闭模态框的按钮添加一个点击事件，用于关闭模态框并清除游戏
+        modalClose.addEventListener("click", function() {
+            // 关闭模态框
+            modal.style.display = "none";
+
+            // 清除模态框内容区域的所有子元素
+            while (modalContent.firstChild) {
+                modalContent.removeChild(modalContent.firstChild);
+            }
+        });
+
+        // 给全屏模态框的按钮添加一个点击事件，用于切换模态框的全屏状态
+        modalFullscreen.addEventListener("click", function() {
+            // 如果模态框内容区域已经是全屏，就退出全屏
+            if (document.fullscreenElement === modalContent) {
+                document.exitFullscreen();
+            } else {
+                // 否则，就进入全屏
+                modalContent.requestFullscreen();
+            }
+        });
+    </script>
 </body>
 </html>
